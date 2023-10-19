@@ -8,7 +8,9 @@ namespace Notepad_1
         public Form1()
         {
             InitializeComponent();
+            this.KeyDown += new KeyEventHandler(Short_Cut);
         }
+        private string currentFile = null;
 
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -25,6 +27,7 @@ namespace Notepad_1
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 richTextBox1.Text = File.ReadAllText(openFileDialog1.FileName);
+                currentFile = openFileDialog1.FileName;
             }
         }
 
@@ -36,10 +39,18 @@ namespace Notepad_1
             }
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (currentFile == null)
+            {
+                saveAsToolStripMenuItem_Click(sender, e);
+            }
+            else
+            {
+                File.WriteAllText(currentFile, richTextBox1.Text);
+            }
         }
+
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -49,6 +60,7 @@ namespace Notepad_1
             if (dr == DialogResult.OK)
             {
                 File.WriteAllText(saveFileDialog1.FileName, richTextBox1.Text);
+                currentFile = saveFileDialog1.FileName;
             }
         }
 
@@ -155,7 +167,7 @@ namespace Notepad_1
             }
             else
             {
-                
+
                 index = richTextBox1.Text.IndexOf(searchText, 0);
                 if (index != -1)
                 {
@@ -173,7 +185,7 @@ namespace Notepad_1
         private void FindPrevious(string searchText)
         {
             int startIndex = richTextBox1.SelectionStart - 1;
-            if (startIndex < 0) startIndex = richTextBox1.Text.Length; 
+            if (startIndex < 0) startIndex = richTextBox1.Text.Length;
             int index = richTextBox1.Text.LastIndexOf(searchText, startIndex);
 
             if (index != -1)
@@ -182,8 +194,9 @@ namespace Notepad_1
                 richTextBox1.ScrollToCaret();
                 currentSearchIndex = index;
             }
-            else            {
-                
+            else
+            {
+
                 index = richTextBox1.Text.LastIndexOf(searchText);
                 if (index != -1)
                 {
@@ -198,5 +211,33 @@ namespace Notepad_1
             }
         }
 
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Short_Cut(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void zoomInToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            float zoom = richTextBox1.ZoomFactor;
+            if (zoom * 2 < 64)
+                richTextBox1.ZoomFactor = zoom * 2;
+        }
+
+        private void zoomOutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            float zoom = richTextBox1.ZoomFactor;
+            if (zoom / 2 > 0.015625)
+                richTextBox1.ZoomFactor = zoom / 2;
+        }
+
+        private void restoreDefaultZoomToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            richTextBox1.ZoomFactor = 1.0f;
+        }
     }
 }
